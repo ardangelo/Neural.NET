@@ -30,6 +30,10 @@ type Network(sizes : int list, activation, prime, weights : Matrix<double> list,
         else 
             Network.FeedForward(this.activation, ([a]), this.weights, this.biases).Head.Map(System.Func<double,double> this.activation)
 
+    member this.FeedForward(input : double list) =
+        let a = DenseMatrix.ofColumnList([input])
+        this.FeedForward(a)
+
     static member FeedForward(activation, z : Matrix<double> list, w : Matrix<double> list, b : Matrix<double> list) : Matrix<double> list =
         if w.IsEmpty then z else
         
