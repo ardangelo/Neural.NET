@@ -13,7 +13,7 @@
     <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <TargetProfile>netcore</TargetProfile>
     <TargetFSharpCoreVersion>3.3.1.0</TargetFSharpCoreVersion>
-    <Name>Neural-FSharp</Name>
+    <Name>Neural</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +38,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <Compile Include="Activations.fs" />
+    <Compile Include="Costs.fs" />
     <Compile Include="Network.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>

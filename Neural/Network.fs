@@ -1,40 +1,38 @@
 ﻿namespace Network
 open Activations
+open Costs
 open MathNet.Numerics.LinearAlgebra
 
-type Network(sizes : int list, activation, prime, weights : Matrix<double> list, biases : Matrix<double> list) = 
+type Network(sizes : int list, activation, prime, weights : Matrix<double> list, biases : Vector<double> list) = 
 
-    public new(activation, prime, weights : double list list list, biases : double list list list) =
+    public new(activation, prime, weights : double list list list, biases : double list list) =
         let weightMatrices = weights |> List.map (fun weight -> DenseMatrix.ofRowList(weight))
-        let biasMatrices = biases |> List.map (fun bias -> DenseMatrix.ofRowList(bias))
+        let biasVectors = biases |> List.map (fun bias -> DenseVector.ofList(bias))
         let sizes = weights |> List.map (fun weight -> weight.Length)
-        Network(sizes, activation, prime, weightMatrices, biasMatrices)
+        Network(sizes, activation, prime, weightMatrices, biasVectors)
 
     public new(sizes : int list) = 
         let weightMatrices = [for i in 0 .. sizes.Length - 2 do yield DenseMatrix.init sizes.[i + 1] sizes.[i] (fun r c -> System.Random().NextDouble())]
-        let biasMatrices = [for i in 0 .. sizes.Length - 2 do yield DenseMatrix.init sizes.[i + 1] 1 (fun r c -> System.Random().NextDouble())]
-        Network(sizes, Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasMatrices)
+        let biasVectors = [for i in 0 .. sizes.Length - 2 do yield DenseVector.init sizes.[i + 1] (fun r -> System.Random().NextDouble())]
+        Network(sizes, Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasVectors)
 
     member private this.activation = activation
     member private this.prime = prime
 
     member private this.weights : Matrix<double> list = weights
-    member private this.biases : Matrix<double> list = biases
+    member private this.biases : Vector<double> list = biases
 
-    static member private WeightedInput(a : Matrix<double>, w : Matrix<double>, b : Matrix<double>) =
+    static member private WeightedInput(a : Vector<double>, w : Matrix<double>, b : Vector<double>) =
         (w * a) + b
 
-    member this.FeedForward(a : Matrix<double>) =
-        if a.ColumnCount > 1 then
-            raise (System.ArgumentException("Input matrix must have only a single column"))
-        else 
-            Network.FeedForward(this.activation, ([a]), this.weights, this.biases).Head.Map(System.Func<double,double> this.activation)
+    member this.FeedForward(a : Vector<double>) =
+        Network.FeedForward(this.activation, ([a]), this.weights, this.biases).Head.Map(System.Func<double,double> this.activation)
 
     member this.FeedForward(input : double list) =
-        let a = DenseMatrix.ofColumnList([input])
+        let a = DenseVector.ofList(input)
         this.FeedForward(a)
 
-    static member FeedForward(activation, z : Matrix<double> list, w : Matrix<double> list, b : Matrix<double> list) : Matrix<double> list =
+    static member FeedForward(activation, z : Vector<double> list, w : Matrix<double> list, b : Vector<double> list) : Vector<double> list =
         if w.IsEmpty then z else
         
         let z' = Network.WeightedInput(z.Head.Map(System.Func<double,double> activation), w.Head, b.Head)

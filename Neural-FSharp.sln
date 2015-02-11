@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Neural-FSharp", "Neural\Neural-FSharp.fsproj", "{2218240D-4FAB-4446-9835-78E924EE5D26}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Neural", "Neural\Neural.fsproj", "{2218240D-4FAB-4446-9835-78E924EE5D26}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NeuralTest", "NeuralTest\NeuralTest.fsproj", "{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}"
 EndProject
