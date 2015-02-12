@@ -16,10 +16,10 @@ let main argv =
     let input : double list = argv |> Array.map double |> Seq.toList
 
     let network = Network(Activations.Step.Activation, Activations.Step.Prime, weights, biases)
-    let outMatrix = network.FeedForward input
+    let output = network.Output input
 
-    let sum = int(outMatrix.At(0))
-    let carry = int(outMatrix.At(1))
+    let sum = int(output.[0])
+    let carry = int(output.[1])
 
     System.Console.WriteLine(printfn "Sum: %i Carry: %i" sum carry)
     0 // return an integer exit code
