@@ -5,5 +5,7 @@
 
 #load "Activations.fs"
 #load "Costs.fs"
+#load "Output.fs"
+#load "Error.fs"
 #load "Network.fs"
 open Network

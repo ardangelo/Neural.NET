@@ -1,10 +1,9 @@
 ﻿namespace Network
+open MathNet.Numerics.LinearAlgebra
 
 open Activations
 open Costs
 open Error
-
-open MathNet.Numerics.LinearAlgebra
 
 [<AutoOpen>]
 type Network(sizes : int list, activation : double -> double, prime : double -> double, weights : Matrix<double> list, biases : Vector<double> list) = 
@@ -50,4 +49,5 @@ type Network(sizes : int list, activation : double -> double, prime : double -> 
         Network.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
 
     member private this.NetworkError(a : Vector<double>, y : Vector<double>) =
-        Network.Error.NetworkError(this.activation, this.actPrime, this.partialCost, a, y, this.weights, this.biases)
+        let reverseZ = Network.Output.FeedForward(this.activation, [a], this.weights, this.biases)
+        Network.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)
