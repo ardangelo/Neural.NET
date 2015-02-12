@@ -1,4 +1,4 @@
-﻿namespace Network
+﻿namespace Neural
 open MathNet.Numerics.LinearAlgebra
 
 open Activations
@@ -6,22 +6,25 @@ open Costs
 open Error
 
 [<AutoOpen>]
-type Network(sizes : int list, activation : double -> double, prime : double -> double, weights : Matrix<double> list, biases : Vector<double> list) = 
+type Network(activation : System.Func<double,double>, prime : System.Func<double,double>, weights : Matrix<double> list, biases : Vector<double> list) = 
 
-    public new(activation, prime, weights : double list list list, biases : double list list) =
+    public new(activation, prime, weights : System.Collections.Generic.List<Matrix<double>>, biases : System.Collections.Generic.List<Vector<double>>) =
+        Network(activation, prime, List.ofSeq weights, List.ofSeq biases)
+
+    static member OfLists(activation, prime, weights : double list list list, biases : double list list) =
         let weightMatrices = weights |> List.map (fun weight -> DenseMatrix.ofRowList(weight))
         let biasVectors = biases |> List.map (fun bias -> DenseVector.ofList(bias))
         let sizes = weights |> List.map (fun weight -> weight.Length)
-        Network(sizes, activation, prime, weightMatrices, biasVectors)
+        Network(activation, prime, weightMatrices, biasVectors)
 
-    public new(sizes : int list) = 
+    static member Randomize(sizes : int list) = 
         let weightMatrices = [for i in 0 .. sizes.Length - 2 do yield DenseMatrix.init sizes.[i + 1] sizes.[i] (fun r c -> System.Random().NextDouble())]
         let biasVectors = [for i in 0 .. sizes.Length - 2 do yield DenseVector.init sizes.[i + 1] (fun r -> System.Random().NextDouble())]
-        Network(sizes, Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasVectors)
+        Network(Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasVectors)
     
     //we are making these Func<double,double> because Math.Net's Map doesn't understand F# function types properly
-    member private this.activation : System.Func<double,double> = (System.Func<double,double> activation)
-    member private this.actPrime : System.Func<double,double> = (System.Func<double,double> prime)
+    member private this.activation = activation
+    member private this.actPrime = prime
 
     member private this.cost = Costs.Quadratic.Cost
     member private this.partialCost = Costs.Quadratic.PartialCost
@@ -41,13 +44,13 @@ type Network(sizes : int list, activation : double -> double, prime : double -> 
 // FeedForward function
 
     member private this.FeedForward(a : Vector<double>) : Vector<double> list =
-        Network.Output.FeedForward(this.activation, ([a]), this.weights, this.biases)
+        Neural.Output.FeedForward(this.activation, ([a]), this.weights, this.biases)
 
 // Error functions
 
     member private this.OutputError(a : Vector<double>, y : Vector<double>) =
-        Network.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
+        Neural.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
 
     member private this.NetworkError(a : Vector<double>, y : Vector<double>) =
-        let reverseZ = Network.Output.FeedForward(this.activation, [a], this.weights, this.biases)
-        Network.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)
+        let reverseZ = Neural.Output.FeedForward(this.activation, [a], this.weights, this.biases)
+        Neural.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)

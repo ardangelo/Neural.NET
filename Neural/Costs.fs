@@ -1,7 +1,7 @@
-﻿namespace Network
+﻿namespace Neural
 open MathNet.Numerics.LinearAlgebra
 
-module Costs =
+module public Costs =
     type Quadratic =
         static member Cost(a : Vector<double>, y : Vector<double>) : double =
             (y - a).Norm(2.0) ** 2.0

@@ -1,13 +1,21 @@
-﻿namespace Network
+﻿namespace Neural
 
-module Activations =
+module public Activations =
     type Step =
-        static member Activation(z : double) : double =
-            if z > 0.0 then 1.0 else 0.0
-        static member Prime(z : double) : double = 0.0
+        static member Activation : System.Func<double,double> =
+            let actSharp (z : double) : double =
+                if z > 0.0 then 1.0 else 0.0
+            (System.Func<double,double> actSharp)
+        static member Prime : System.Func<double,double> = 
+            let primeSharp (z : double) : double = 0.0
+            (System.Func<double,double> primeSharp)
 
     type Sigmoid =
-        static member Activation(z : double) : double =
-            1.0 / (1.0 + MathNet.Numerics.Constants.E ** (-1.0 * z))
-        static member Prime(z : double) : double =
-            Sigmoid.Activation(z) * (1.0 - Sigmoid.Activation(z))
+        static member Activation : System.Func<double,double> =
+            let actSharp (z : double) : double =
+                1.0 / (1.0 + MathNet.Numerics.Constants.E ** (-1.0 * z))
+            (System.Func<double,double> actSharp)
+        static member Prime : System.Func<double,double> = 
+            let primeSharp (z : double) : double =
+                1.0 / (1.0 + MathNet.Numerics.Constants.E ** (-1.0 * z)) * (1.0 - (1.0 / (1.0 + MathNet.Numerics.Constants.E ** (-1.0 * z))))
+            (System.Func<double,double> primeSharp)

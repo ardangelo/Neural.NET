@@ -1,6 +1,6 @@
 ﻿// Learn more about F# at http://fsharp.net
 // See the 'F# Tutorial' project for more help.
-open Network
+open Neural
 
 [<EntryPoint>]
 let main argv = 
@@ -15,7 +15,7 @@ let main argv =
         
     let input : double list = argv |> Array.map double |> Seq.toList
 
-    let network = Network(Activations.Step.Activation, Activations.Step.Prime, weights, biases)
+    let network = Network.OfLists(Activations.Step.Activation, Activations.Step.Prime, weights, biases)
     let output = network.Output input
 
     let sum = int(output.[0])

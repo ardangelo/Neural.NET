@@ -1,4 +1,4 @@
-﻿namespace Network
+﻿namespace Neural
 open MathNet.Numerics.LinearAlgebra
 
 module Output =

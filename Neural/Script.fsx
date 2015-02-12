@@ -8,4 +8,4 @@
 #load "Output.fs"
 #load "Error.fs"
 #load "Network.fs"
-open Network
+open Neural
