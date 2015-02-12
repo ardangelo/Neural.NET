@@ -39,6 +39,8 @@
     <None Include="packages.config" />
     <Compile Include="Activations.fs" />
     <Compile Include="Costs.fs" />
+    <Compile Include="Output.fs" />
+    <Compile Include="Error.fs" />
     <Compile Include="Network.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>
