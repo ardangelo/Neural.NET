@@ -7,5 +7,6 @@
 #load "Costs.fs"
 #load "Output.fs"
 #load "Error.fs"
+#load "Learn.fs"
 #load "Network.fs"
 open Neural

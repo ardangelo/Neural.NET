@@ -41,6 +41,7 @@
     <Compile Include="Costs.fs" />
     <Compile Include="Output.fs" />
     <Compile Include="Error.fs" />
+    <Compile Include="Learn.fs" />
     <Compile Include="Network.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>
