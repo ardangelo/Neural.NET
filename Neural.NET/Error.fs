@@ -1,4 +1,4 @@
-﻿namespace Neural
+﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
 module Error =
@@ -26,7 +26,7 @@ module Error =
         stepBack([OutputError(activation, actPrime, partialCost, reverseZ.Head, y)], reverseZ, reverseW)
 
     let Backpropagate(activation, actPrime, partialCost, a, y, w : Matrix<double> list, b) : Matrix<double> list * Vector<double> list =
-        let reverseZ = Neural.Output.FeedForward(activation, [a], w, b)
+        let reverseZ = NeuralNet.Output.FeedForward(activation, [a], w, b)
         let error = NetworkError(activation, actPrime, partialCost, reverseZ, y, w)
         let z = List.rev(reverseZ)
 

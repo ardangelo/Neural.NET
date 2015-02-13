@@ -1,4 +1,4 @@
-﻿namespace Neural
+﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
 open Activations
@@ -44,13 +44,13 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
 // FeedForward function
 
     member private this.FeedForward(a : Vector<double>) : Vector<double> list =
-        Neural.Output.FeedForward(this.activation, ([a]), this.weights, this.biases)
+        NeuralNet.Output.FeedForward(this.activation, ([a]), this.weights, this.biases)
 
 // Error functions
 
     member private this.OutputError(a : Vector<double>, y : Vector<double>) =
-        Neural.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
+        NeuralNet.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
 
     member private this.NetworkError(a : Vector<double>, y : Vector<double>) =
-        let reverseZ = Neural.Output.FeedForward(this.activation, [a], this.weights, this.biases)
-        Neural.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)
+        let reverseZ = NeuralNet.Output.FeedForward(this.activation, [a], this.weights, this.biases)
+        NeuralNet.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)

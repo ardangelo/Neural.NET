@@ -9,4 +9,4 @@
 #load "Error.fs"
 #load "Learn.fs"
 #load "Network.fs"
-open Neural
+open NeuralNet

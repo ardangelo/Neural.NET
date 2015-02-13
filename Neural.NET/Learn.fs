@@ -1,11 +1,11 @@
-﻿namespace Neural
+﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
 module Learn =
     let CalculateGradient(activation, actPrime, partialCost, batch : (Vector<double> * Vector<double>) list, w : Matrix<double> list, b : Vector<double> list) =
 
         let singleExCalc((x, y), nablaW, nablaB) =
-            let (deltaNablaW, deltaNablaB) = Neural.Error.Backpropagate(activation, actPrime, partialCost, x, y, w, b)
+            let (deltaNablaW, deltaNablaB) = NeuralNet.Error.Backpropagate(activation, actPrime, partialCost, x, y, w, b)
             List.unzip (List.zip (List.zip nablaW nablaB) (List.zip deltaNablaW deltaNablaB) |> List.map(fun ((nW, nB), (dNW, dNB)) -> 
                 ((nW + dNW), (nB + dNB))))
 

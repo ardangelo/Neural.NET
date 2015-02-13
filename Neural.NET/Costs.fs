@@ -1,4 +1,4 @@
-﻿namespace Neural
+﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
 module public Costs =

@@ -56,8 +56,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neural\Neural.fsproj">
-      <Name>Neural</Name>
+    <ProjectReference Include="..\Neural.NET\Neural.NET.fsproj">
+      <Name>Neural.NET</Name>
       <Project>{2218240d-4fab-4446-9835-78e924ee5d26}</Project>
       <Private>True</Private>
     </ProjectReference>

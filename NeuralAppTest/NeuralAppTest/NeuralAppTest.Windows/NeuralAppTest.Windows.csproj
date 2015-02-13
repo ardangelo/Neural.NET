@@ -128,9 +128,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\..\..\..\Documents\Visual Studio 2013\Projects\Neural-FSharp\Neural\Neural.fsproj">
+    <ProjectReference Include="..\..\..\Neural.NET\Neural.NET.fsproj">
       <Project>{2218240d-4fab-4446-9835-78e924ee5d26}</Project>
-      <Name>Neural</Name>
+      <Name>Neural.NET</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">

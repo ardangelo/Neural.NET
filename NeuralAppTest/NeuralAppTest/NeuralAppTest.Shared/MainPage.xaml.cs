@@ -13,7 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-using Neural;
+using NeuralNet;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Collections;
 using MathNet.Numerics.LinearAlgebra;

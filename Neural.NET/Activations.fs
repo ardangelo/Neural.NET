@@ -1,4 +1,4 @@
-﻿namespace Neural
+﻿namespace NeuralNet
 
 module public Activations =
     type Step =
