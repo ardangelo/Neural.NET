@@ -17,10 +17,18 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
         let sizes = weights |> List.map (fun weight -> weight.Length)
         Network(activation, prime, weightMatrices, biasVectors)
 
-    static member Randomize(sizes : int list) = 
-        let weightMatrices = [for i in 0 .. sizes.Length - 2 do yield DenseMatrix.init sizes.[i + 1] sizes.[i] (fun r c -> System.Random().NextDouble())]
-        let biasVectors = [for i in 0 .. sizes.Length - 2 do yield DenseVector.init sizes.[i + 1] (fun r -> System.Random().NextDouble())]
+    static member Randomize(sizes : int list) =
+        let rnd = System.Random()
+        let weightMatrices = 
+            [for i in 0 .. sizes.Length - 2 do 
+                yield DenseMatrix.ofRowList([for j in 0 .. sizes.[i + 1] - 1 do yield List.init sizes.[i] (fun _ -> rnd.NextDouble())])]
+        let biasVectors = 
+            [for i in 1 .. sizes.Length - 1 do 
+                yield DenseVector.ofList(List.init sizes.[i] (fun _ -> rnd.NextDouble()))]
         Network(Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasVectors)
+
+    static member Randomize(sizes : System.Collections.Generic.List<int>) =
+        Network.Randomize(List.ofSeq sizes)
     
     //we are making these Func<double,double> because Math.Net's Map doesn't understand F# function types properly
     member private this.activation = activation
@@ -57,14 +65,14 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
 
 // Learning function
     
-    member private this.Teach(examples : (Vector<double> * Vector<double>) list) =
-        let eta = 3.0
-        let batchSize = 10
-        let epochs = 30
+    member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs, testData) =
 
-        let (w', b') = Learn.StochasticGradientDescent(this.activation, this.actPrime, this.partialCost, eta, epochs, batchSize, examples, this.weights, this.biases)
+        let (w', b') = Learn.StochasticGradientDescent(this.activation, this.actPrime, this.partialCost, eta, epochs, batchSize, examples, this.weights, this.biases, testData)
 
         this.weights <- w'
         this.biases <- b'
 
-        (w', b')
+        (this.weights, this.biases)
+
+    member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs) =
+        this.Teach(examples, eta, batchSize, epochs, [])

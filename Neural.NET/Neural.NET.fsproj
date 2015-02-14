@@ -36,7 +36,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <Compile Include="Activations.fs" />
     <Compile Include="Costs.fs" />
     <Compile Include="Output.fs" />
@@ -44,6 +43,7 @@
     <Compile Include="Learn.fs" />
     <Compile Include="Network.fs" />
     <None Include="Script.fsx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
