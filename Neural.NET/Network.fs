@@ -29,8 +29,8 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     member private this.cost = Costs.Quadratic.Cost
     member private this.partialCost = Costs.Quadratic.PartialCost
 
-    member private this.weights : Matrix<double> list = weights
-    member private this.biases : Vector<double> list = biases
+    member val private weights : Matrix<double> list = weights with get, set
+    member val private biases : Vector<double> list = biases with get, set
 
 // Calculate output of system
 
@@ -54,3 +54,17 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     member private this.NetworkError(a : Vector<double>, y : Vector<double>) =
         let reverseZ = NeuralNet.Output.FeedForward(this.activation, [a], this.weights, this.biases)
         NeuralNet.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)
+
+// Learning function
+    
+    member private this.Teach(examples : (Vector<double> * Vector<double>) list) =
+        let eta = 3.0
+        let batchSize = 10
+        let epochs = 30
+
+        let (w', b') = Learn.StochasticGradientDescent(this.activation, this.actPrime, this.partialCost, eta, epochs, batchSize, examples, this.weights, this.biases)
+
+        this.weights <- w'
+        this.biases <- b'
+
+        (w', b')

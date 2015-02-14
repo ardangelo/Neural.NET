@@ -17,7 +17,7 @@ module Error =
         let reverseW = List.rev(w)
 
         let rec stepBack(prevErrors : Vector<double> list, reverseZ : Vector<double> list, reverseW : Matrix<double> list) : Vector<double> list = 
-            if reverseZ.Length = 0 then
+            if reverseZ.Length = 1 then //don't care about "error" of input
                 prevErrors
             else
             let prevErrors' = List.Cons(PreviousError(actPrime, prevErrors.Head, reverseZ.Head, reverseW.Head), prevErrors)
@@ -28,7 +28,7 @@ module Error =
     let Backpropagate(activation, actPrime, partialCost, a, y, w : Matrix<double> list, b) : Matrix<double> list * Vector<double> list =
         let reverseZ = NeuralNet.Output.FeedForward(activation, [a], w, b)
         let error = NetworkError(activation, actPrime, partialCost, reverseZ, y, w)
-        let z = List.rev(reverseZ)
+        let z = List.rev(reverseZ.Tail) //pretty sure tail here
 
         let nablaW = [for i in 0 .. error.Length do yield (error.[i].ToColumnMatrix() * Matrix.transpose(z.[i].Map(activation).ToColumnMatrix()))]
 

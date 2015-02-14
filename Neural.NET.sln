@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Neural.NET", "Neural.NET\Neural.NET.fsproj", "{2218240D-4FAB-4446-9835-78E924EE5D26}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NeuralTest", "NeuralTest\NeuralTest.fsproj", "{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NeuralAppTest.Shared", "NeuralAppTest\NeuralAppTest\NeuralAppTest.Shared\NeuralAppTest.Shared.shproj", "{1A51810B-4180-4D53-AE84-94D0E29C63BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralAppTest.WindowsPhone", "NeuralAppTest\NeuralAppTest\NeuralAppTest.WindowsPhone\NeuralAppTest.WindowsPhone.csproj", "{76355060-EBB2-4DE8-9C15-EABFC4EB8CBA}"
@@ -42,16 +40,6 @@ Global
 		{2218240D-4FAB-4446-9835-78E924EE5D26}.Release|ARM.ActiveCfg = Release|Any CPU
 		{2218240D-4FAB-4446-9835-78E924EE5D26}.Release|x64.ActiveCfg = Release|Any CPU
 		{2218240D-4FAB-4446-9835-78E924EE5D26}.Release|x86.ActiveCfg = Release|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Release|ARM.ActiveCfg = Release|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Release|x64.ActiveCfg = Release|Any CPU
-		{3FF3FBBB-62C8-4DFA-9900-EECE83226BFD}.Release|x86.ActiveCfg = Release|Any CPU
 		{76355060-EBB2-4DE8-9C15-EABFC4EB8CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{76355060-EBB2-4DE8-9C15-EABFC4EB8CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76355060-EBB2-4DE8-9C15-EABFC4EB8CBA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
