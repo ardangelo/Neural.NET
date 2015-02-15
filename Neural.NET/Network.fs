@@ -21,10 +21,10 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
         let rnd = System.Random()
         let weightMatrices = 
             [for i in 0 .. sizes.Length - 2 do 
-                yield DenseMatrix.ofRowList([for j in 0 .. sizes.[i + 1] - 1 do yield List.init sizes.[i] (fun _ -> rnd.NextDouble())])]
+                yield Matrix.Build.Random(sizes.[i + 1], sizes.[i], rnd.Next())]
         let biasVectors = 
             [for i in 1 .. sizes.Length - 1 do 
-                yield DenseVector.ofList(List.init sizes.[i] (fun _ -> rnd.NextDouble()))]
+                yield Vector.Build.Random(sizes.[i], rnd.Next())]
         Network(Activations.Sigmoid.Activation, Activations.Sigmoid.Prime, weightMatrices, biasVectors)
 
     static member Randomize(sizes : System.Collections.Generic.List<int>) =
@@ -43,7 +43,7 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
 // Calculate output of system
 
     member this.Output(a : Vector<double>) =
-        this.FeedForward(a).Head.Map(this.activation)
+        this.FeedForward(a).Head.Map(this.activation, Zeros.Include)
 
     member this.Output(input : double list) = 
         let a = DenseVector.ofList(input)

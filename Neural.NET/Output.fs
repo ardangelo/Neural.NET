@@ -9,6 +9,6 @@ module Output =
     let rec FeedForward(activation, z : Vector<double> list, w : Matrix<double> list, b : Vector<double> list) : Vector<double> list =
         if w.IsEmpty then z else
         
-        let z' = WeightedInput(z.Head.Map activation, w.Head, b.Head)
+        let z' = WeightedInput(z.Head.Map(activation, Zeros.Include), w.Head, b.Head)
 
         FeedForward(activation, List.Cons(z', z), w.Tail, b.Tail)
