@@ -1,7 +1,7 @@
 ﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
-module Output =
+module private Output =
 
     let WeightedInput(a : Vector<double>, w : Matrix<double>, b : Vector<double>) =
         (w * a) + b

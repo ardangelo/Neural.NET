@@ -43,6 +43,18 @@ let main argv =
         "../../../teach-data/7-test";
         "../../../teach-data/8-test";
         "../../../teach-data/9-test"]
+
+    let bothfiles = [ // currently throws stackoverflow on using complete dataset
+        "../../../teach-data/0.hex";
+        "../../../teach-data/1.hex";
+        "../../../teach-data/2.hex";
+        "../../../teach-data/3.hex";
+        "../../../teach-data/4.hex";
+        "../../../teach-data/5.hex";
+        "../../../teach-data/6.hex";
+        "../../../teach-data/7.hex";
+        "../../../teach-data/8.hex";
+        "../../../teach-data/9.hex"]
     
     let rec buildExamples(rs : Vector<double> list, fs : string list) = 
         if rs.Length = 0 then List.empty else
@@ -63,18 +75,19 @@ let main argv =
     let testdata = buildExamples(resultVectors, testfiles)
 
     let network = Network.Randomize(sizes)
-    let (w, b) = network.Teach(examples, 3.0, 10, 30, testdata)
-
+    let (w, b) = network.Teach(examples, 3.0, 20, 30, testdata)
+    let (w, b) = network.Teach(testdata, 3.0, 20, 30, examples)
     
     let mutable filename = "output.cs"
     if argv.Length = 1 then
         filename <- argv.[0]
 
-    let bw = new BinaryWriter(File.Open("output.txt", FileMode.Create))
-    bw.Write("double[,] biases = new double[,] {\n")
+    // still needs a bit of cleanup before it's clean C# code
+    let bw = new BinaryWriter(File.Open(filename, FileMode.Create))
+    bw.Write("List<Vector<double>> biases = new List<Vector<double>>() {\n")
     
     let rec writeVectorString(vects : Vector<double> list) =
-        if vects.Length = 0 then bw.Write("};\n") else
+        if vects.Length = 0 then bw.Write("}\n") else
         let vs = vects.Head.ToVectorString(System.Int32.MaxValue, 1, "F3")
         let line = "{" + vs.Replace("\r\n", ",")
         if vects.Length = 1 then 
@@ -85,19 +98,19 @@ let main argv =
 
     writeVectorString(b)
 
-    bw.Write("double[,,] weights = new double[,,] {\n")
+    bw.Write("List<Matrix<double>> weights = new List<Matrix<double>>() {\n")
 
     let rec writeMatrixString(m : Matrix<double> list) =
         if m.Length = 0 then bw.Write("};\n") else
 
-        bw.Write("{\n")
+        bw.Write("Matrix<double>.Build.DenseOfArray(new [,] {\n")
         let listOfVects = [for row in m.Head.ToRowArrays() do yield DenseVector.ofArray(row)]
         writeVectorString(listOfVects)
 
         if m.Length = 1 then 
             bw.Write("}\n")
         else
-            bw.Write("}, \n")
+            bw.Write("}), \n")
         writeMatrixString(m.Tail)
 
     writeMatrixString(w)

@@ -1,7 +1,7 @@
 ﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
-module Learn =
+module private Learn =
     // calculate weights, biases adjustments for a single batch
     let CalculateGradient(activation, actPrime, partialCost, batch : (Vector<double> * Vector<double>) list, w : Matrix<double> list, b : Vector<double> list) =
 
