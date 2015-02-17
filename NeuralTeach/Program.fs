@@ -55,6 +55,8 @@ let main argv =
         "../../../teach-data/7.hex";
         "../../../teach-data/8.hex";
         "../../../teach-data/9.hex"]
+
+    printfn "Building examples..."
     
     let rec buildExamples(rs : Vector<double> list, fs : string list) = 
         if rs.Length = 0 then List.empty else
@@ -74,7 +76,19 @@ let main argv =
     let examples = buildExamples(resultVectors, learnfiles)
     let testdata = buildExamples(resultVectors, testfiles)
 
-    let network = Network.Randomize(sizes)
+    printfn "Starting to teach %d examples" examples.Length
+
+    let agent : MailboxProcessor<string> = MailboxProcessor.Start(fun inbox ->
+        let rec messageLoop = async {
+            let! msg = inbox.Receive()
+            printfn "%s" msg
+            return! messageLoop
+        }
+
+        messageLoop
+    )
+
+    let network = Network.Randomize(sizes, Some(agent))
     let (w, b) = network.Teach(examples, 3.0, 20, 30, testdata)
     let (w, b) = network.Teach(testdata, 3.0, 20, 30, examples)
     

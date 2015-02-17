@@ -51,29 +51,30 @@ module private Learn =
 
     // split up large amount of training examples and descend for each one, returning completed weights, biases
     // groups of N examples, all examples run through epochs times
-    let rec StochasticGradientDescent(activation, actPrime, partialCost, eta, epochs, batchSize, examples : (Vector<double> * Vector<double>) list, w, b, testData : (Vector<double> * Vector<double>) list) =
+    let rec StochasticGradientDescent(activation, actPrime, partialCost, eta, epochs, batchSize, examples : (Vector<double> * Vector<double>) list, w, b, testData : (Vector<double> * Vector<double>) list, agent : MailboxProcessor<string> option) =
+
         let rec DescendAllBatches(batches : (Vector<double> * Vector<double>) list list, w, b) =
             if batches.Length = 0 then (w, b) else
             let (w', b') = DescendBatch(activation, actPrime, partialCost, eta, batches.Head, w, b)
             DescendAllBatches(batches.Tail, w', b')
 
-        #if DEBUG
-        System.Diagnostics.Debug.WriteLine(sprintf "%d epochs left" epochs)
-        #endif
+        if (agent.IsSome) then
+            agent.Value.Post(sprintf "%d epochs left" epochs)
 
         if epochs = 0 then (w, b) else
         let batches = Split(Shuffle(examples), batchSize)
+
         let (w', b') = DescendAllBatches(batches, w, b)
         
-        #if DEBUG
-        System.Diagnostics.Debug.WriteLine(sprintf "epoch complete")
+        if (agent.IsSome) then
+            agent.Value.Post(sprintf "epoch complete")
         let success = 
             [for test in testData do 
                 let a : Vector<double> = NeuralNet.Output.FeedForward(activation, [fst test], w', b').Head.Map(activation, Zeros.Include)
                 yield if a.MaximumIndex() = (snd test).MaximumIndex() then 1 else 0] |> List.sum
-        System.Diagnostics.Debug.WriteLine(sprintf "%d / %d correct" success testData.Length)
+        if (agent.IsSome) then
+            agent.Value.Post(sprintf "%d / %d correct" success testData.Length)
         System.Diagnostics.Debug.WriteLine(sprintf "weight sum %f" (w |> List.map (fun wl -> Matrix.sum wl) |> List.sum))
         System.Diagnostics.Debug.WriteLine(sprintf "bias sum %f" (b |> List.map (fun bl -> Vector.sum bl) |> List.sum))
-        #endif
 
-        StochasticGradientDescent(activation, actPrime, partialCost, eta, epochs - 1, batchSize, examples, w', b', testData)
+        StochasticGradientDescent(activation, actPrime, partialCost, eta, epochs - 1, batchSize, examples, w', b', testData, agent)

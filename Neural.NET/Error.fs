@@ -28,8 +28,7 @@ module private Error =
     let Backpropagate(activation, actPrime, partialCost : Vector<double> * Vector<double> -> Vector<double>, a, y, w : Matrix<double> list, b) : Matrix<double> list * Vector<double> list =
         let reverseZ = NeuralNet.Output.FeedForward(activation, [a], w, b)
         let error = NetworkError(activation, actPrime, partialCost, reverseZ, y, w)
-        let z = List.rev(reverseZ.Tail)
 
-        let nablaW = [for i in 0 .. error.Length - 1 do yield (error.[i].ToColumnMatrix() * Matrix.transpose(z.[i].Map(activation, Zeros.Include).ToColumnMatrix()))]
+        let nablaW = [for i in 0 .. error.Length - 1 do yield (error.[i].ToColumnMatrix() * Matrix.transpose(reverseZ.[(reverseZ.Length - 1) - i].Map(activation, Zeros.Include).ToColumnMatrix()))]
 
         (nablaW, error)
