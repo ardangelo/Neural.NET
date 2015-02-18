@@ -31,13 +31,13 @@ module private Learn =
 
         (w', b')
 
-    let Shuffle(target : 'a list) =
+    let Shuffle(target : 'a list) : 'a list =
         let rnd = System.Random()
-        let rec helper(target : 'a list, indices : int array) =
-            if indices.Length = 0 then List.empty else
+        let rec helper(target : 'a list, indices : int array, shuffled : 'a list) =
+            if indices.Length = 0 then shuffled else
             let j = rnd.Next(0, indices.Length - 1)
-            List.Cons(target.[indices.[j]], helper(target, indices |> Array.filter((<>)indices.[j])))
-        helper(target, [|0 .. target.Length - 1|])
+            helper(target, indices |> Array.filter((<>)indices.[j]), List.Cons(target.[indices.[j]], shuffled))
+        helper(target, [|0 .. target.Length - 1|], ([] : 'a list))
 
     let Split(target : 'a list, n : int) =
         let rec SplitAt(head : 'a list, tail : 'a list, n) =

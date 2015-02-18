@@ -2,6 +2,7 @@
 // See the 'F# Tutorial' project for more help.
 
 open MathNet.Numerics.LinearAlgebra
+open System
 open System.IO
 open NeuralNet
 
@@ -20,31 +21,8 @@ let main argv =
         DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0; 0.0];
         DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0];
         DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0]];
-    let learnfiles = [
-        "../../../teach-data/0-learn";
-        "../../../teach-data/1-learn";
-        "../../../teach-data/2-learn";
-        "../../../teach-data/3-learn";
-        "../../../teach-data/4-learn";
-        "../../../teach-data/5-learn";
-        "../../../teach-data/6-learn";
-        "../../../teach-data/7-learn";
-        "../../../teach-data/8-learn";
-        "../../../teach-data/9-learn"]
 
-    let testfiles = [
-        "../../../teach-data/0-test";
-        "../../../teach-data/1-test";
-        "../../../teach-data/2-test";
-        "../../../teach-data/3-test";
-        "../../../teach-data/4-test";
-        "../../../teach-data/5-test";
-        "../../../teach-data/6-test";
-        "../../../teach-data/7-test";
-        "../../../teach-data/8-test";
-        "../../../teach-data/9-test"]
-
-    let bothfiles = [ // currently throws stackoverflow on using complete dataset
+    let files = [ // currently throws stackoverflow on using complete dataset
         "../../../teach-data/0.hex";
         "../../../teach-data/1.hex";
         "../../../teach-data/2.hex";
@@ -57,6 +35,7 @@ let main argv =
         "../../../teach-data/9.hex"]
 
     printfn "Building examples..."
+    let start = System.DateTime.Now
     
     let rec buildExamples(rs : Vector<double> list, fs : string list) = 
         if rs.Length = 0 then List.empty else
@@ -73,10 +52,10 @@ let main argv =
 
         List.append digits (buildExamples (rs.Tail, fs.Tail))
 
-    let examples = buildExamples(resultVectors, learnfiles)
-    let testdata = buildExamples(resultVectors, testfiles)
+    let examples = buildExamples(resultVectors, files)
 
-    printfn "Starting to teach %d examples" examples.Length
+    printfn "Took %A ms to build examples" (System.DateTime.Now - start).Milliseconds
+    printfn "Starting to teach %d examples..." examples.Length
 
     let agent : MailboxProcessor<string> = MailboxProcessor.Start(fun inbox ->
         let rec messageLoop = async {
@@ -89,15 +68,14 @@ let main argv =
     )
 
     let network = Network.Randomize(sizes, Some(agent))
-    let (w, b) = network.Teach(examples, 3.0, 20, 30, testdata)
-    let (w, b) = network.Teach(testdata, 3.0, 20, 30, examples)
+    let (w, b) = network.Teach(examples, 3.0, 10, 1, examples)
     
     let mutable filename = "output.cs"
     if argv.Length = 1 then
         filename <- argv.[0]
 
     // still needs a bit of cleanup before it's clean C# code
-    let bw = new BinaryWriter(File.Open(filename, FileMode.Create))
+    let bw = new StreamWriter(File.Open(filename, FileMode.Create))
     bw.Write("List<Vector<double>> biases = new List<Vector<double>>() {\n")
     
     let rec writeVectorString(vects : Vector<double> list) =
@@ -128,5 +106,8 @@ let main argv =
         writeMatrixString(m.Tail)
 
     writeMatrixString(w)
+
+    printfn "Press enter to exit..."
+    let x = Console.ReadLine()
     
     0 // return an integer exit code
