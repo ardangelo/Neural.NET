@@ -11,12 +11,6 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     public new(activation, prime, weights : System.Collections.Generic.List<Matrix<double>>, biases : System.Collections.Generic.List<Vector<double>>, agent : MailboxProcessor<string> option) =
         Network(activation, prime, List.ofSeq weights, List.ofSeq biases, agent)
 
-    static member OfLists(activation, prime, weights : double list list list, biases : double list list, agent : MailboxProcessor<string> option) =
-        let weightMatrices = weights |> List.map (fun weight -> DenseMatrix.ofRowList(weight))
-        let biasVectors = biases |> List.map (fun bias -> DenseVector.ofList(bias))
-        let sizes = weights |> List.map (fun weight -> weight.Length)
-        Network(activation, prime, weightMatrices, biasVectors, agent)
-
     static member Randomize(sizes : int list, agent : MailboxProcessor<string> option) =
         let rnd = System.Random()
         let weightMatrices = 
@@ -47,10 +41,6 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     member this.Output(a : Vector<double>) =
         this.FeedForward(a).Head.Map(this.activation, Zeros.Include)
 
-    member this.Output(input : double list) = 
-        let a = DenseVector.ofList(input)
-        Array.toList(this.Output(a).ToArray())
-
 // FeedForward function
 
     member private this.FeedForward(a : Vector<double>) : Vector<double> list =
@@ -67,7 +57,8 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
 
 // Learning function
     
-    member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs, testData) =
+    member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs, ?testData : (Vector<double> * Vector<double>) list) =
+        let testData = defaultArg testData []
 
         let (w', b') = Learn.StochasticGradientDescent(this.activation, this.actPrime, this.partialCost, eta, epochs, batchSize, examples, this.weights, this.biases, testData, this.agent)
 
@@ -75,6 +66,3 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
         this.biases <- b'
 
         (this.weights, this.biases)
-
-    member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs) =
-        this.Teach(examples, eta, batchSize, epochs, [])

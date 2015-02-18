@@ -35,7 +35,6 @@ let main argv =
         "../../../teach-data/9.hex"]
 
     printfn "Building examples..."
-    let start = System.DateTime.Now
     
     let rec buildExamples(rs : Vector<double> list, fs : string list) = 
         if rs.Length = 0 then List.empty else
@@ -54,7 +53,6 @@ let main argv =
 
     let examples = buildExamples(resultVectors, files)
 
-    printfn "Took %A ms to build examples" (System.DateTime.Now - start).Milliseconds
     printfn "Starting to teach %d examples..." examples.Length
 
     let agent : MailboxProcessor<string> = MailboxProcessor.Start(fun inbox ->
