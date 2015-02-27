@@ -66,11 +66,12 @@ let main argv =
     )
 
     let network = Network.Randomize(sizes, Some(agent))
-    let (w, b) = network.Teach(examples, 3.0, 10, 1, examples)
+    let (w, b) = network.Teach(examples, 0.5, 10, 1, examples)
     
-    let mutable filename = "output.cs"
-    if argv.Length = 1 then
-        filename <- argv.[0]
+    let filename = "output.cs"
+    let mutable epochs = 30
+    if argv.Length > 0 then
+        epochs <- System.Int32.Parse(argv.[0])
 
     // still needs a bit of cleanup before it's clean C# code
     let bw = new StreamWriter(File.Open(filename, FileMode.Create))
@@ -98,7 +99,7 @@ let main argv =
         writeVectorString(listOfVects)
 
         if m.Length = 1 then 
-            bw.Write("}\n")
+            bw.Write("})\n")
         else
             bw.Write("}), \n")
         writeMatrixString(m.Tail)
@@ -107,5 +108,5 @@ let main argv =
 
     printfn "Press enter to exit..."
     let x = Console.ReadLine()
-    
+        
     0 // return an integer exit code

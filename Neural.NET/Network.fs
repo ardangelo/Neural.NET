@@ -28,8 +28,8 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     member private this.activation = activation
     member private this.actPrime = prime
 
-    member private this.cost = Costs.Quadratic.Cost
-    member private this.partialCost = Costs.Quadratic.PartialCost
+    member private this.cost = Costs.CrossEntropy.Cost
+    member private this.partialCost = Costs.CrossEntropy.PartialCost
 
     member val weights : Matrix<double> list = weights with get, set
     member val biases : Vector<double> list = biases with get, set
