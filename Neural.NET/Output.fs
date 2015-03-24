@@ -3,12 +3,16 @@ open MathNet.Numerics.LinearAlgebra
 
 module private Output =
 
-    let WeightedInput(a : Vector<double>, w : Matrix<double>, b : Vector<double>) =
+    let WeightedInput (a : Vector<double>) (w : Matrix<double>) (b : Vector<double>) =
         (w * a) + b
 
-    let rec FeedForward(activation, z : Vector<double> list, w : Matrix<double> list, b : Vector<double> list) : Vector<double> list =
+    let rec FeedForward activation (z : Vector<double> list) (w : Matrix<double> list) (b : Vector<double> list) : Vector<double> list =
         if w.IsEmpty then z else
-        
-        let z' = WeightedInput(z.Head.Map(activation, Zeros.Include), w.Head, b.Head)
+        let a = z.Head.Map(activation, Zeros.Include)
+        let z' = WeightedInput a w.Head b.Head
 
-        FeedForward(activation, List.Cons(z', z), w.Tail, b.Tail)
+        FeedForward activation (z'::z) w.Tail b.Tail
+
+    let SoftMax (lastZ : Vector<double>) =
+        let denom = lastZ.PointwiseExp().Sum()
+        lastZ.Map(fun zi -> (MathNet.Numerics.Constants.E ** zi) / denom)

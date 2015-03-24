@@ -1,7 +1,4 @@
-﻿// Learn more about F# at http://fsharp.net
-// See the 'F# Tutorial' project for more help.
-
-open MathNet.Numerics.LinearAlgebra
+﻿open MathNet.Numerics.LinearAlgebra
 open System
 open System.IO
 open NeuralNet
@@ -9,20 +6,9 @@ open NeuralNet
 [<EntryPoint>]
 let main argv = 
     let sizes = [784;30;10]
+    let resultVectors = Matrix.Build.DenseIdentity(10).ToRowArrays() |> Array.map (fun (a : double []) -> Vector.Build.DenseOfArray(a)) |> List.ofSeq
 
-    let resultVectors = [
-        DenseVector.ofList [1.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 1.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 1.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 1.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 1.0; 0.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0; 0.0];
-        DenseVector.ofList [0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 0.0; 1.0]];
-
-    let files = [ // currently throws stackoverflow on using complete dataset
+    let files = [
         "../../../teach-data/0.hex";
         "../../../teach-data/1.hex";
         "../../../teach-data/2.hex";
@@ -36,7 +22,7 @@ let main argv =
 
     printfn "Building examples..."
     
-    let rec buildExamples(rs : Vector<double> list, fs : string list) = 
+    let rec buildExamples (rs : Vector<double> list) (fs : string list) = 
         if rs.Length = 0 then List.empty else
         let reader = new BinaryReader(File.Open(fs.Head, FileMode.Open))
 
@@ -49,9 +35,9 @@ let main argv =
         let images = (int)(reader.BaseStream.Length) / (784 * 2)
         let digits = [for i in 1 .. images do yield (readNextMNIST(reader), rs.Head)]
 
-        List.append digits (buildExamples (rs.Tail, fs.Tail))
+        List.append digits (buildExamples rs.Tail fs.Tail)
 
-    let examples = buildExamples(resultVectors, files)
+    let examples = buildExamples resultVectors files
 
     printfn "Starting to teach %d examples..." examples.Length
 
@@ -64,20 +50,20 @@ let main argv =
 
         messageLoop
     )
-
-    let network = Network.Randomize(sizes, Some(agent))
-    let (w, b) = network.Teach(examples, 0.5, 10, 1, examples)
     
     let filename = "output.cs"
     let mutable epochs = 30
     if argv.Length > 0 then
         epochs <- System.Int32.Parse(argv.[0])
 
+    let network = Network.Randomize(sizes, Some(agent))
+    let (w, b) = network.Teach(examples, 0.5, 10, epochs, examples)
+
     // still needs a bit of cleanup before it's clean C# code
     let bw = new StreamWriter(File.Open(filename, FileMode.Create))
     bw.Write("List<Vector<double>> biases = new List<Vector<double>>() {\n")
     
-    let rec writeVectorString(vects : Vector<double> list) =
+    let rec writeVectorString (vects : Vector<double> list) =
         if vects.Length = 0 then bw.Write("}\n") else
         let vs = vects.Head.ToVectorString(System.Int32.MaxValue, 1, "F3")
         let line = "{" + vs.Replace("\r\n", ",")
@@ -85,18 +71,18 @@ let main argv =
             bw.Write(line.Substring(0, line.Length - 2) + "}\n")
         else
             bw.Write(line.Substring(0, line.Length - 2) + "}, \n")
-        writeVectorString(vects.Tail)
+        writeVectorString vects.Tail
 
-    writeVectorString(b)
+    writeVectorString b
 
     bw.Write("List<Matrix<double>> weights = new List<Matrix<double>>() {\n")
 
-    let rec writeMatrixString(m : Matrix<double> list) =
+    let rec writeMatrixString (m : Matrix<double> list) =
         if m.Length = 0 then bw.Write("};\n") else
 
         bw.Write("Matrix<double>.Build.DenseOfArray(new [,] {\n")
         let listOfVects = [for row in m.Head.ToRowArrays() do yield DenseVector.ofArray(row)]
-        writeVectorString(listOfVects)
+        writeVectorString listOfVects
 
         if m.Length = 1 then 
             bw.Write("})\n")
@@ -107,6 +93,6 @@ let main argv =
     writeMatrixString(w)
 
     printfn "Press enter to exit..."
-    let x = Console.ReadLine()
+    do Console.ReadLine() |> ignore
         
     0 // return an integer exit code

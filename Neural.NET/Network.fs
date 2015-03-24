@@ -41,26 +41,26 @@ type Network(activation : System.Func<double,double>, prime : System.Func<double
     member this.Output(a : Vector<double>) =
         this.FeedForward(a).Head.Map(this.activation, Zeros.Include)
 
+    member this.ProbabilityDistribution(a : Vector<double>) =
+        this.FeedForward(a).Head |> NeuralNet.Output.SoftMax
+
 // FeedForward function
 
     member private this.FeedForward(a : Vector<double>) : Vector<double> list =
-        NeuralNet.Output.FeedForward(this.activation, ([a]), this.weights, this.biases)
+        NeuralNet.Output.FeedForward this.activation ([a]) this.weights this.biases
 
 // Error functions
 
-    member private this.OutputError(a : Vector<double>, y : Vector<double>) =
-        NeuralNet.Error.OutputError(this.activation, this.actPrime, this.partialCost, this.FeedForward(a).Head, y)
-
     member private this.NetworkError(a : Vector<double>, y : Vector<double>) =
-        let reverseZ = NeuralNet.Output.FeedForward(this.activation, [a], this.weights, this.biases)
-        NeuralNet.Error.NetworkError(this.activation, this.actPrime, this.partialCost, reverseZ, y, this.weights)
+        let reverseZ = NeuralNet.Output.FeedForward this.activation [a] this.weights this.biases
+        NeuralNet.Error.NetworkError this.activation this.actPrime this.partialCost reverseZ y this.weights
 
 // Learning function
     
     member this.Teach(examples : (Vector<double> * Vector<double>) list, eta, batchSize, epochs, ?testData : (Vector<double> * Vector<double>) list) =
         let testData = defaultArg testData []
 
-        let (w', b') = Learn.StochasticGradientDescent(this.activation, this.actPrime, this.partialCost, eta, epochs, batchSize, examples, this.weights, this.biases, testData, this.agent)
+        let (w', b') = Learn.StochasticTraining this.activation this.actPrime this.partialCost eta epochs batchSize examples this.weights this.biases testData this.agent
 
         this.weights <- w'
         this.biases <- b'
