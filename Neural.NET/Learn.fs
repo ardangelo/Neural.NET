@@ -1,8 +1,8 @@
 ﻿namespace NeuralNet
 open MathNet.Numerics.LinearAlgebra
 
-module private Learn =
-    let rec GradientDescent activation actPrime partialCost eta (batches : (Vector<double> * Vector<double>) list list) w b =
+module private Learn =    
+    let GradientDescent activation actPrime partialCost eta (batch : (Vector<double> * Vector<double>) list) (w, b) =
         // calculate weights, biases adjustments for a single batch
         let CalculateGradient (batch : (Vector<double> * Vector<double>) list) =
 
@@ -19,16 +19,14 @@ module private Learn =
                 entireBatchCalc batch.Tail nablaW' nablaB'
 
             entireBatchCalc batch nablaW nablaB
-
-        if batches.Length = 0 then (w, b) else
-            
-        let m = (double)(batches.Head.Length)
-        let (nablaW, nablaB) = CalculateGradient batches.Head
+                        
+        let m = (double)(batch.Length)
+        let (nablaW, nablaB) = CalculateGradient batch
 
         let w' = [for (wl, nwl) in (List.zip w nablaW) do yield (wl - ((eta/m) * nwl))]
         let b' = [for (bl, bwl) in (List.zip b nablaB) do yield (bl - ((eta/m) * bwl))]
 
-        GradientDescent activation actPrime partialCost eta batches.Tail w' b'
+        (w', b')
         
     // split up large amount of training examples and descend for each one, returning completed weights, biases
     // groups of N examples, all examples run through epochs times
@@ -50,21 +48,27 @@ module private Learn =
             helper tail (List.append res [head])
         helper target []
 
-    let rec StochasticTraining activation actPrime partialCost eta epochs batchSize (examples : (Vector<double> * Vector<double>) list) w b (testData : (Vector<double> * Vector<double>) list) (agent : MailboxProcessor<string> option) =
-        if epochs = 0 then (w, b) else
+    //updateVector is the method that takes a batch and some abstract vector `v` and makes it more "fit" using the batch data
+    //StochasticTraining could be swapped out with eg. GeneticTraining or other training algorithm
+    let rec StochasticTraining updateVector v epochs batchSize (examples : 'a list) (testData : 'a list) (agent : MailboxProcessor<string> option) =
+        let rec UpdateUsingBatch (batches : 'a list list) (w, b) =
+            if batches.IsEmpty then (w, b) else
+            UpdateUsingBatch batches.Tail (updateVector batches.Head v)
+
+        if epochs = 0 then v else
 
         if (agent.IsSome) then agent.Value.Post(sprintf "%d epochs left" epochs)
 
         let batches = Split (Shuffle examples) batchSize
-        let (w', b') = GradientDescent activation actPrime partialCost eta batches w b
+        let v' = UpdateUsingBatch batches v
         
         if (agent.IsSome) then agent.Value.Post(sprintf "epoch complete")
 
         //test adjusted weights / biases
-        let successes = 
+        (*let successes = 
             testData |> List.map (fun (x, y) -> 
                 let a : Vector<double> = (NeuralNet.Output.FeedForward activation [x] w' b').Head.Map(activation, Zeros.Include)
                 if a.MaximumIndex() = y.MaximumIndex() then 1 else 0) |> List.sum
-        if (agent.IsSome) then agent.Value.Post(sprintf "%d / %d correct" successes testData.Length)
+        if (agent.IsSome) then agent.Value.Post(sprintf "%d / %d correct" successes testData.Length) *)
 
-        StochasticTraining activation actPrime partialCost eta (epochs - 1) batchSize examples w' b' testData agent
+        StochasticTraining updateVector v' (epochs - 1) batchSize examples testData agent

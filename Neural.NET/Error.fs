@@ -31,8 +31,9 @@ module private Error =
         let reverseZ = NeuralNet.Output.FeedForward activation [a] w b
         let error = NetworkError activation actPrime partialCost reverseZ y w
 
-        (*let nablaW = [for i in 0 .. error.Length - 1 do yield (error.[i].ToColumnMatrix() * Matrix.transpose(reverseZ.[(reverseZ.Length - 1) - i].Map(activation, Zeros.Include).ToColumnMatrix()))]*)
-        let nablaW = (List.rev reverseZ) |> (error |> List.map2(fun (delta:Vector<double>) (zi:Vector<double>) -> 
-            delta.ToColumnMatrix() * Matrix.transpose(zi.Map(activation, Zeros.Include).ToColumnMatrix())))
+        //TODO: debug commented line to get rid of last `for`
+        let nablaW = [for i in 0 .. error.Length - 1 do yield (error.[i].ToColumnMatrix() * Matrix.transpose(reverseZ.[(reverseZ.Length - 1) - i].Map(activation, Zeros.Include).ToColumnMatrix()))]
+        //let nablaW = List.rev reverseZ |> (error |> List.map2(fun (delta:Vector<double>) (zi:Vector<double>) -> 
+        //   delta.ToColumnMatrix() * Matrix.transpose(zi.Map(activation, Zeros.Include).ToColumnMatrix())))
 
         (nablaW, error)

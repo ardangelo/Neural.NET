@@ -8,17 +8,19 @@ let main argv =
     let sizes = [784;30;10]
     let resultVectors = Matrix.Build.DenseIdentity(10).ToRowArrays() |> Array.map (fun (a : double []) -> Vector.Build.DenseOfArray(a)) |> List.ofSeq
 
-    let files = [
-        "../../../teach-data/0.hex";
-        "../../../teach-data/1.hex";
-        "../../../teach-data/2.hex";
-        "../../../teach-data/3.hex";
-        "../../../teach-data/4.hex";
-        "../../../teach-data/5.hex";
-        "../../../teach-data/6.hex";
-        "../../../teach-data/7.hex";
-        "../../../teach-data/8.hex";
-        "../../../teach-data/9.hex"]
+    //let file = "../../../train-data-60k.tsv"
+    let files = [ 
+        "../../../teach-data/0.hex"; 
+        "../../../teach-data/1.hex"; 
+        "../../../teach-data/2.hex"; 
+        "../../../teach-data/3.hex"; 
+        "../../../teach-data/4.hex"; 
+        "../../../teach-data/5.hex"; 
+        "../../../teach-data/6.hex"; 
+        "../../../teach-data/7.hex"; 
+        "../../../teach-data/8.hex"; 
+        "../../../teach-data/9.hex"] 
+
 
     printfn "Building examples..."
     
@@ -56,7 +58,7 @@ let main argv =
     if argv.Length > 0 then
         epochs <- System.Int32.Parse(argv.[0])
 
-    let network = Network.Randomize(sizes, Some(agent))
+    let network = NeuralNetwork.Randomize(sizes, Some(agent))
     let (w, b) = network.Teach(examples, 0.5, 10, epochs, examples)
 
     // still needs a bit of cleanup before it's clean C# code
