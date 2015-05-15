@@ -13,7 +13,7 @@ As the library is under heavy development, examine the included client NeuralApp
 
 As Neural.NET targets the Portable Class Library, it is trivial to integrate into, say, a Windows Phone 8 app.
 I have also written [NeuralAppTest](https://github.com/excelangue/NeuralAppTest), a simple implementation of such a Neural.NET client.
-Users can draw a number in the square box and the app displays what it thinks is the number. The weights and biases of the network come from the output of `NeuralTeach`. 
+Users can draw a number in the square box and the app displays what it thinks is the number. The weights and biases of the network come from the output of NeuralTeach. 
 
 ![Drawing a number](http://andrew.uni.cx/assets/images/neural-net/neural-draw.jpg)
 

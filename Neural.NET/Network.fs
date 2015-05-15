@@ -5,10 +5,6 @@ open Activations
 open Costs
 open Error
 
-type ITrainable<'input, 'output> =
-    abstract member Output : 'input -> 'output
-    abstract member NetworkError : 'input * 'output -> 'output seq
-
 [<AutoOpen>]
 type NeuralNetwork(activation : System.Func<double,double>, prime : System.Func<double,double>, weights : Matrix<double> list, biases : Vector<double> list, agent : MailboxProcessor<string> option) = 
     public new(activation, prime, weights : System.Collections.Generic.List<Matrix<double>>, biases : System.Collections.Generic.List<Vector<double>>, agent : MailboxProcessor<string> option) =
@@ -62,7 +58,7 @@ type NeuralNetwork(activation : System.Func<double,double>, prime : System.Func<
         let testData = defaultArg testData []
 
         let updateMethod = (Learn.GradientDescent this.activation this.actPrime this.partialCost eta)
-        let (w', b') = Learn.StochasticTraining updateMethod (this.weights, this.biases) epochs batchSize examples testData this.agent
+        let (w', b') = Learn.StochasticTraining updateMethod (this.weights, this.biases) examples testData this.agent epochs batchSize
 
         this.weights <- w'
         this.biases <- b'
