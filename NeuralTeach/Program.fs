@@ -58,7 +58,7 @@ let main argv =
     if argv.Length > 0 then
         epochs <- System.Int32.Parse(argv.[0])
 
-    let network = NeuralNetwork.Randomize(sizes, Some(agent))
+    let network = FeedForwardNetwork.Randomize(sizes, Some(agent))
     let (w, b) = network.Teach(examples, 0.5, 10, epochs, examples)
 
     // still needs a bit of cleanup before it's clean C# code
